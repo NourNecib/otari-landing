@@ -237,30 +237,39 @@
 
   <!-- JS : envoi de l'email vers ton backend -->
   <script>
-    const form = document.getElementById('waitlist-form');
-    const emailInput = document.getElementById('waitlist-email');
-    const msg = document.getElementById('waitlist-message');
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('waitlist-form');
+      const emailInput = document.getElementById('waitlist-email');
+      const msg = document.getElementById('waitlist-message');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      msg.textContent = 'Envoi en cours...';
-
-      try {
-        const res = await fetch('/api/waitlist', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: emailInput.value })
-        });
-
-        if (res.ok) {
-          msg.textContent = 'Merci ! Tu es sur la liste.';
-          emailInput.value = '';
-        } else {
-          msg.textContent = 'Une erreur est survenue. Merci de réessayer.';
-        }
-      } catch (err) {
-        msg.textContent = 'Erreur réseau. Merci de réessayer.';
+      if (!form) {
+        console.error('Formulaire waitlist introuvable');
+        return;
       }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (msg) msg.textContent = 'Envoi en cours...';
+
+        try {
+          const res = await fetch('/api/waitlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: emailInput.value })
+          });
+
+          if (res.ok) {
+            if (msg) msg.textContent = 'Merci ! Tu es sur la liste.';
+            emailInput.value = '';
+          } else {
+            if (msg) msg.textContent = 'Une erreur est survenue. Merci de réessayer.';
+          }
+        } catch (err) {
+          console.error(err);
+          if (msg) msg.textContent = 'Erreur réseau. Merci de réessayer.';
+        }
+      });
     });
+  </script>
 </body>
 </html>
